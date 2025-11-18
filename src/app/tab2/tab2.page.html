@@ -1,17 +1,37 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Nueva Atención</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <form (ngSubmit)="guardar()">
+    <ion-item>
+      <ion-label position="stacked">Paciente</ion-label>
+      <ion-input [(ngModel)]="atencion.paciente" name="paciente" required></ion-input>
+    </ion-item>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+    <ion-item>
+      <ion-label position="stacked">Especie</ion-label>
+      <ion-select [(ngModel)]="atencion.especie" name="especie">
+        <ion-select-option>Perro</ion-select-option>
+        <ion-select-option>Gato</ion-select-option>
+        <ion-select-option>Otro</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Motivo</ion-label>
+      <ion-input [(ngModel)]="atencion.motivo" name="motivo"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Importe $</ion-label>
+      <ion-input type="number" [(ngModel)]="atencion.importe" name="importe"></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top">
+      Guardar Atención
+    </ion-button>
+  </form>
 </ion-content>
