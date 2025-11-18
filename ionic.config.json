@@ -1,0 +1,7 @@
+{
+  "name": "VetControl",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
