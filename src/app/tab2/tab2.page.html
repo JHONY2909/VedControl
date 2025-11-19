@@ -1,37 +1,97 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-title>Nueva Atención</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form (ngSubmit)="guardar()">
+
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+
+    <!-- Foto -->
+    <ion-card>
+      <ion-card-content class="ion-text-center">
+        
+        <ion-img 
+          *ngIf="foto; else placeholder" 
+          [src]="foto"
+          style="height: 220px; object-fit: cover; border-radius: 12px;">
+        </ion-img>
+
+        <ng-template #placeholder>
+          <div style="height: 220px; background: #f4f5f8; border-radius: 12px; 
+                      display: flex; align-items: center; justify-content: center;">
+            <ion-icon name="camera-outline" size="large" color="medium"></ion-icon>
+          </div>
+        </ng-template>
+
+        <ion-button fill="outline" (click)="tomarFoto()" class="ion-margin-top">
+          <ion-icon slot="start" name="camera-outline"></ion-icon>
+          Tomar foto del paciente
+        </ion-button>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Formulario -->
     <ion-item>
-      <ion-label position="stacked">Paciente</ion-label>
-      <ion-input [(ngModel)]="atencion.paciente" name="paciente" required></ion-input>
+      <ion-label position="stacked">Paciente <ion-text color="danger">*</ion-text></ion-label>
+      <ion-input formControlName="paciente" placeholder="Nombre de la mascota"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label position="stacked">Especie</ion-label>
-      <ion-select [(ngModel)]="atencion.especie" name="especie">
-        <ion-select-option>Perro</ion-select-option>
-        <ion-select-option>Gato</ion-select-option>
-        <ion-select-option>Otro</ion-select-option>
+      <ion-label position="stacked">Especie <ion-text color="danger">*</ion-text></ion-label>
+      <ion-select formControlName="especie" placeholder="Seleccionar">
+        <ion-select-option value="Perro">Perro</ion-select-option>
+        <ion-select-option value="Gato">Gato</ion-select-option>
+        <ion-select-option value="Ave">Ave</ion-select-option>
+        <ion-select-option value="Roedor">Roedor</ion-select-option>
+        <ion-select-option value="Reptil">Reptil</ion-select-option>
+        <ion-select-option value="Otro">Otro</ion-select-option>
       </ion-select>
     </ion-item>
 
     <ion-item>
-      <ion-label position="stacked">Motivo</ion-label>
-      <ion-input [(ngModel)]="atencion.motivo" name="motivo"></ion-input>
+      <ion-label position="stacked">Raza (opcional)</ion-label>
+      <ion-input formControlName="raza"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label position="stacked">Importe $</ion-label>
-      <ion-input type="number" [(ngModel)]="atencion.importe" name="importe"></ion-input>
+      <ion-label position="stacked">Motivo de consulta <ion-text color="danger">*</ion-text></ion-label>
+      <ion-textarea formControlName="motivo" rows="3"></ion-textarea>
     </ion-item>
 
-    <ion-button expand="block" type="submit" class="ion-margin-top">
-      Guardar Atención
+    <ion-item>
+      <ion-label position="stacked">Diagnóstico</ion-label>
+      <ion-textarea formControlName="diagnostico" rows="3"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Tratamiento indicado</ion-label>
+      <ion-textarea formControlName="tratamiento" rows="3"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Importe $ <ion-text color="danger">*</ion-text></ion-label>
+      <ion-input type="number" formControlName="importe"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label>¿Recordatorio de vacuna en 30 días?</ion-label>
+      <ion-checkbox formControlName="proximaVacuna"></ion-checkbox>
+    </ion-item>
+
+    <ion-button 
+      expand="block" 
+      type="submit" 
+      size="large"
+      class="guardando ion-margin-top">
+      
+      <ion-spinner *ngIf="guardando"></ion-spinner>
+      {{ guardando ? 'Guardando...' : 'Guardar Atención' }}
+
     </ion-button>
+
   </form>
+
 </ion-content>

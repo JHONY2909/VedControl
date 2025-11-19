@@ -1,6 +1,6 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="primary">
-    <ion-title>Dashboard</ion-title>
+    <ion-title>Dashboard VetControl</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="logout()">Salir</ion-button>
     </ion-buttons>
@@ -8,45 +8,55 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <h1>¡Bienvenido a VetControl!</h1>
 
-  <ion-grid>
-    <ion-row>
-      <ion-col size="6">
-        <ion-card color="success">
-          <ion-card-header>
-            <ion-card-title>Ingresos del mes</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <h1>${{ estadisticas.total | number:'1.0-0' }}</h1>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size="6">
-        <ion-card color="tertiary">
-          <ion-card-header>
-            <ion-card-title>Atenciones del mes</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <h1>{{ estadisticas.cantidad }}</h1>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <ion-spinner *ngIf="cargando()" name="crescent"></ion-spinner>
 
-  <h3>Últimas 5 atenciones</h3>
-  <ion-list>
-    <ion-item *ngFor="let a of ultimas">
-      <ion-label>
-        <h2>{{ a.paciente }} ({{ a.especie }})</h2>
-        <p>{{ a.motivo }} - ${{ a.importe }}</p>
-        <p>{{ a.created_at | date:'short' }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+  <div *ngIf="!cargando()">
 
-  <ion-button expand="block" routerLink="/tabs/tab2">
-    Registrar nueva atención
-  </ion-button>
+    <h2 class="ion-text-center">¡Bienvenido a VetControl!</h2>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-card color="success">
+            <ion-card-header><ion-card-title>Ingresos del mes</ion-card-title></ion-card-header>
+            <ion-card-content><h1>${{ ingresosMes() | number:'1.0-0' }}</h1></ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6">
+          <ion-card color="tertiary">
+            <ion-card-header><ion-card-title>Atenciones del mes</ion-card-title></ion-card-header>
+            <ion-card-content><h1>{{ cantidadMes() }}</h1></ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- GRÁFICOS -->
+    <ion-card>
+      <ion-card-header><ion-card-title>Ingresos últimos 6 meses</ion-card-title></ion-card-header>
+      <ion-card-content><canvas id="chartBarras"></canvas></ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header><ion-card-title>Distribución por especie</ion-card-title></ion-card-header>
+      <ion-card-content><canvas id="chartPie"></canvas></ion-card-content>
+    </ion-card>
+
+    <h3>Últimas 5 atenciones</h3>
+    <ion-list>
+      <ion-item *ngFor="let a of ultimas5()">
+        <ion-label>
+          <h2>{{ a.paciente }} <small>({{ a.especie }})</small></h2>
+          <p>{{ a.motivo }} - ${{ a.importe }}</p>
+          <p>{{ a.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" class="ion-margin-top" (click)="irATab2()">
+      Registrar nueva atención
+    </ion-button>
+
+  </div>
 </ion-content>
