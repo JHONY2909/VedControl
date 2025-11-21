@@ -3,10 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
-  IonList, IonItem, IonLabel, IonButton, IonIcon,
+  IonList, IonItem, IonLabel, IonIcon,
   IonSearchbar, IonRefresher, IonRefresherContent
 } from '@ionic/angular/standalone';
-import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { AtencionService } from '../services/atencion.service';
 
 @Component({
@@ -14,35 +13,37 @@ import { AtencionService } from '../services/atencion.service';
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
   imports: [
-      CommonModule, RouterModule,
-      IonHeader, IonToolbar, IonTitle, IonContent,
-      IonList, IonItem, IonLabel, IonIcon,
-      IonSearchbar, IonRefresher, IonRefresherContent
-    ],
+    CommonModule,
+    RouterModule,
+    IonHeader, IonToolbar, IonTitle, IonContent,
+    IonList, IonItem, IonLabel, IonIcon,
+    IonSearchbar, IonRefresher, IonRefresherContent
+  ],
 })
 export class Tab3Page {
-  atenciones = this.atencionService.atenciones;
-  
-  constructor(
-    private atencionService: AtencionService
-  ) {}
+  // Usamos la lista ya filtrada del servicio
+  atenciones = this.atencionService.filteredAtenciones;
+
+  constructor(private atencionService: AtencionService) {}
 
   async ionViewWillEnter() {
+    this.atencionService.setSearchTerm(''); // limpia búsqueda al entrar
     await this.atencionService.cargar();
   }
 
   async refrescar(event: any) {
     await this.atencionService.cargar();
+    this.atencionService.setSearchTerm(''); // limpia filtro al refrescar
     event.target.complete();
   }
 
-  buscar(event: CustomEvent) {
-    // Aquí puedes implementar búsqueda si es necesario
-    console.log('Búsqueda:', event.detail.value);
+  buscar(event: any) {
+    const query = event.target.value || '';
+    this.atencionService.setSearchTerm(query);
   }
 
   verDetalle(atencion: any) {
-    // Implementar navegación al detalle de la atención
     console.log('Ver detalle:', atencion);
+    // Aquí luego harás la navegación al detalle
   }
 }

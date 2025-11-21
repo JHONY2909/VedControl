@@ -8,7 +8,22 @@ export class AtencionService {
   // Estado reactivo con Signals
   atenciones = signal<any[]>([]);
   cargando = signal(true);
-  
+
+  // NUEVO: Búsqueda reactiva
+  searchTerm = signal<string>('');
+
+  filteredAtenciones = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    if (!term) return this.atenciones();
+
+    return this.atenciones().filter(atencion =>
+      (atencion.paciente ?? '').toLowerCase().includes(term) ||
+      (atencion.especie ?? '').toLowerCase().includes(term) ||
+      (atencion.raza ?? '').toLowerCase().includes(term) ||
+      (atencion.motivo ?? '').toLowerCase().includes(term)
+    );
+  });
+
   // Datos mock
   private datosMock = [
     {
@@ -95,7 +110,7 @@ export class AtencionService {
       ...atencion,
       user_id: user.id,
       foto: atencion.foto || null,
-      proximaVacuna: atencion.proximaVacuna || false // 👈 CORRECTO
+      proximaVacuna: atencion.proximaVacuna || false
     };
 
     const { data, error } = await this.supabase
@@ -109,9 +124,7 @@ export class AtencionService {
       return { data: null, error };
     }
 
-    // Actualizar el estado reactivo
     this.atenciones.update(lista => [data, ...lista]);
-
     return { data, error: null };
   }
 
@@ -125,5 +138,10 @@ export class AtencionService {
       .order('created_at', { ascending: false });
 
     return { data, error };
+  }
+
+  // NUEVO: Método público para actualizar el término de búsqueda
+  setSearchTerm(term: string) {
+    this.searchTerm.set(term);
   }
 }

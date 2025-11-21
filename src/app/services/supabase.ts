@@ -10,7 +10,14 @@ export class SupabaseService {
   constructor() {
     this.supabase = createClient(
       'https://jgzxcbjmmbpcvchfghfg.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnenhjYmptbWJwY3ZjaGZnaGZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NzU3MzksImV4cCI6MjA3OTA1MTczOX0.zMXcyNRVbjl4y6ZIkjPQ2FEJUqbfIOupXprwJJjgbVI'
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnenhjYmptbWJwY3ZjaGZnaGZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NzU3MzksImV4cCI6MjA3OTA1MTczOX0.zMXcyNRVbjl4y6ZIkjPQ2FEJUqbfIOupXprwJJjgbVI',
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          storage: localStorage  // <-- esto activa multi-tab automáticamente
+        }
+      }
     );
   }
 

@@ -6,7 +6,11 @@
 
 <ion-content class="ion-padding">
   <!-- Barra de búsqueda -->
-  <ion-searchbar placeholder="Buscar por paciente o especie..." (ionInput)="buscar($event)"></ion-searchbar>
+  <ion-searchbar 
+    placeholder="Buscar por paciente, especie, raza o motivo..." 
+    (ionInput)="buscar($event)"
+    debounce="300">
+  </ion-searchbar>
 
   <!-- Pull to refresh -->
   <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)">
@@ -28,7 +32,7 @@
     </ion-item>
   </ion-list>
 
-  <!-- Mensaje cuando no hay datos -->
+  <!-- Mensaje cuando no hay datos (considerando filtro activo) -->
   <div *ngIf="atenciones().length === 0" class="ion-text-center ion-padding">
     <ion-icon name="document-text-outline" size="large" color="medium"></ion-icon>
     <p>No hay atenciones registradas</p>
