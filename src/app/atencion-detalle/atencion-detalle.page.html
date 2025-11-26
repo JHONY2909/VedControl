@@ -1,0 +1,57 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab3"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Atención</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div *ngIf="atencion(); let a; else noEncontrada">
+
+    <!-- Foto -->
+    <ion-card>
+      <ion-img 
+        *ngIf="a.foto" 
+        [src]="a.foto"
+        style="height: 280px; object-fit: cover;">
+      </ion-img>
+      <div *ngIf="!a.foto" class="no-foto">
+        <ion-icon name="paw-outline" size="large"></ion-icon>
+        <p>Sin foto</p>
+      </div>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ a.paciente }} ({{ a.especie }})</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item lines="none"><strong>Raza:</strong> {{ a.raza || 'No especificada' }}</ion-item>
+        <ion-item lines="none"><strong>Motivo:</strong> {{ a.motivo }}</ion-item>
+        <ion-item lines="none"><strong>Diagnóstico:</strong> {{ a.diagnostico || '—' }}</ion-item>
+        <ion-item lines="none"><strong>Tratamiento:</strong> {{ a.tratamiento || '—' }}</ion-item>
+        <ion-item lines="none"><strong>Importe:</strong> ${{ a.importe | number:'1.0-0' }}</ion-item>
+        <ion-item lines="none"><strong>Fecha:</strong> {{ a.created_at | date:'dd/MM/yyyy HH:mm' }}</ion-item>
+        <ion-item lines="none">
+          <strong>Vacuna próxima:</strong>
+          <ion-badge [color]="a.proximaVacuna ? 'danger' : 'success'" class="ion-margin-start">
+            {{ a.proximaVacuna ? 'Sí' : 'No' }}
+          </ion-badge>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <ng-template #noEncontrada>
+    <div class="ion-text-center ion-padding">
+      <ion-icon name="sad" size="large" color="medium"></ion-icon>
+      <p>No se encontró la atención</p>
+      <ion-button expand="block" fill="clear" (click)="volver()">Volver</ion-button>
+    </div>
+  </ng-template>
+
+</ion-content>

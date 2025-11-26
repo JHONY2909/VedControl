@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router'; // ← Agregamos Router
 import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonList, IonItem, IonLabel, IonIcon,
@@ -21,19 +21,21 @@ import { AtencionService } from '../services/atencion.service';
   ],
 })
 export class Tab3Page {
-  // Usamos la lista ya filtrada del servicio
   atenciones = this.atencionService.filteredAtenciones;
 
-  constructor(private atencionService: AtencionService) {}
+  constructor(
+    private atencionService: AtencionService,
+    private router: Router  // ← Inyectamos Router
+  ) {}
 
   async ionViewWillEnter() {
-    this.atencionService.setSearchTerm(''); // limpia búsqueda al entrar
+    this.atencionService.setSearchTerm('');
     await this.atencionService.cargar();
   }
 
   async refrescar(event: any) {
     await this.atencionService.cargar();
-    this.atencionService.setSearchTerm(''); // limpia filtro al refrescar
+    this.atencionService.setSearchTerm('');
     event.target.complete();
   }
 
@@ -42,8 +44,9 @@ export class Tab3Page {
     this.atencionService.setSearchTerm(query);
   }
 
-  verDetalle(atencion: any) {
-    console.log('Ver detalle:', atencion);
-    // Aquí luego harás la navegación al detalle
-  }
+  // ¡AHORA SÍ NAVEGA!
+verDetalle(atencion: any) {
+  this.router.navigate(['/atencion-detalle', atencion.id]); // ← funciona con string o número
+}
+
 }
