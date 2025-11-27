@@ -25,10 +25,20 @@
           </div>
         </ng-template>
 
-        <ion-button fill="outline" (click)="tomarFoto()" class="ion-margin-top">
-          <ion-icon slot="start" name="camera-outline"></ion-icon>
-          Tomar foto del paciente
-        </ion-button>
+        <div class="ion-text-center ion-margin-top">
+          <ion-button fill="outline" (click)="tomarFoto()" class="ion-margin-end">
+            <ion-icon slot="start" name="camera-outline"></ion-icon>
+            Tomar foto
+          </ion-button>
+          
+          <ion-button fill="outline" (click)="seleccionarFoto()" class="ion-margin-start">
+            <ion-icon slot="start" name="images-outline"></ion-icon>
+            Seleccionar
+          </ion-button>
+        </div>
+        
+        <input #fileInput type="file" accept="image/*" style="display: none;" 
+               (change)="onFileSelected($event)">
 
       </ion-card-content>
     </ion-card>

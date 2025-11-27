@@ -144,4 +144,26 @@ export class AtencionService {
   setSearchTerm(term: string) {
     this.searchTerm.set(term);
   }
+
+  // ================================
+  // Eliminar atención
+  // ================================
+  async eliminar(atencionId: number) {
+    const { error } = await this.supabase
+      .from('atenciones')
+      .delete()
+      .eq('id', atencionId);
+
+    if (error) {
+      console.error('Error eliminando:', error);
+      return { data: null, error };
+    }
+
+    // Actualizar estado reactivo
+    this.atenciones.update(lista => 
+      lista.filter(a => a.id !== atencionId)
+    );
+
+    return { data: true, error: null };
+  }
 }

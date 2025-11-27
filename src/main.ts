@@ -10,7 +10,11 @@ import { cameraOutline } from 'ionicons/icons';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
-defineCustomElements(window);
+
+// Solo inicializar PWA Elements en entorno web
+if (typeof window !== 'undefined') {
+  defineCustomElements(window);
+}
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

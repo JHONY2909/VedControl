@@ -1,12 +1,24 @@
+<!-- src/app/atencion-detalle/atencion-detalle.page.html -->
+<!-- src/app/atencion-detalle/atencion-detalle.page.html -->
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/tab3"></ion-back-button>
     </ion-buttons>
     <ion-title>Detalle de Atención</ion-title>
+
+    <ion-buttons slot="end">
+      <!-- EDITAR -->
+      <ion-button fill="clear" color="light" (click)="editar()">
+        <ion-icon name="create-outline" size="large"></ion-icon>
+      </ion-button>
+      <!-- ELIMINAR -->
+      <ion-button fill="clear" color="danger" (click)="confirmarEliminar()">
+        <ion-icon name="trash-bin-outline" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content class="ion-padding">
 
   <div *ngIf="atencion(); let a; else noEncontrada">
