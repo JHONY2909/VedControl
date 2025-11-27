@@ -93,4 +93,10 @@ export class LoginPage implements OnInit {
     });
     t.present();
   }
+
+  // Función placeholder para el botón de Google (solo visual por ahora)
+  async iniciarConGoogle() {
+    // TODO: Implementar autenticación con Google
+    this.mostrarToast('Función de Google en desarrollo', 'warning');
+  }
 }

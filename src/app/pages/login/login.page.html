@@ -27,6 +27,16 @@
       </ion-button>
     </form>
 
-    <p class="info">Primera vez: usa vet@test.com / 123456</p>
+    <!-- Botón de iniciar con Google -->
+    <div class="divider">
+      <span>o</span>
+    </div>
+
+    <ion-button expand="block" fill="outline" class="btn-google" (click)="iniciarConGoogle()">
+      <ion-icon slot="start" name="logo-google"></ion-icon>
+      Iniciar con Google
+    </ion-button>
+
+    <p class="info"></p>
   </div>
 </ion-content>

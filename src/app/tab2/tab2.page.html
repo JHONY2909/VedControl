@@ -36,6 +36,18 @@
             Seleccionar
           </ion-button>
         </div>
+
+        <!-- Indicador del método disponible -->
+        <div class="ion-text-center ion-margin-top" style="font-size: 0.85em; color: var(--ion-color-medium);">
+          <ion-text *ngIf="isRunningInApp(); else webMethod">
+            📱 App nativa: Ambos métodos disponibles
+          </ion-text>
+          <ng-template #webMethod>
+            <ion-text>
+              
+            </ion-text>
+          </ng-template>
+        </div>
         
         <input #fileInput type="file" accept="image/*" style="display: none;" 
                (change)="onFileSelected($event)">

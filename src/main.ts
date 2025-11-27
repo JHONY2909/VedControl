@@ -11,9 +11,15 @@ import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
-// Solo inicializar PWA Elements en entorno web
-if (typeof window !== 'undefined') {
-  defineCustomElements(window);
+// Solo inicializar PWA Elements en entorno web y navegador
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  try {
+    defineCustomElements(window);
+    console.log('PWA Elements initialized successfully');
+  } catch (error) {
+    console.warn('Error initializing PWA Elements:', error);
+    // Continuar sin PWA Elements si falla la inicialización
+  }
 }
 bootstrapApplication(AppComponent, {
   providers: [

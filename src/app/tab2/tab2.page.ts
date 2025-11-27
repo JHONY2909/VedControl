@@ -71,74 +71,229 @@ export class Tab2Page {
 
   async tomarFoto() {
     try {
-      // Verificar si estamos en un entorno web
+      // En entorno web, usar implementación nativa de HTML5
       const isWeb = typeof window !== 'undefined' && !this.isRunningInApp();
       
       if (isWeb) {
-        // En entorno web, primero verificar si getUserMedia está disponible
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          this.mostrarToast('La cámara no está disponible en este navegador. Use "Seleccionar" para subir foto.', 'warning');
-          return;
+        const resultado = await this.tomarFotoWeb();
+        if (resultado) {
+          this.foto = resultado;
         }
-
-        // Verificar permisos de cámara
-        try {
-          const devices = await navigator.mediaDevices.enumerateDevices();
-          const videoDevices = devices.filter(device => device.kind === 'videoinput');
-          
-          if (videoDevices.length === 0) {
-            this.mostrarToast('No se encontró ninguna cámara en el dispositivo. Use "Seleccionar" para subir foto.', 'warning');
-            return;
-          }
-        } catch (permError) {
-          console.error('Error verificando dispositivos:', permError);
-          this.mostrarToast('Error de permisos de cámara. Use "Seleccionar" para subir foto.', 'warning');
-          return;
-        }
-      }
-
-      // Verificar que Camera esté disponible
-      if (!Camera || !Camera.getPhoto) {
-        this.mostrarToast('Cámara no disponible. Use "Seleccionar" para subir foto desde galería.', 'warning');
         return;
       }
 
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Camera
-      });
-
-      this.foto = image.dataUrl || null;
-      this.mostrarToast('Foto tomada correctamente', 'success');
+      // En entorno nativo, usar Capacitor Camera
+      if (Camera && Camera.getPhoto) {
+        try {
+          const image = await Camera.getPhoto({
+            quality: 90,
+            allowEditing: false,
+            resultType: CameraResultType.DataUrl,
+            source: CameraSource.Camera
+          });
+          this.foto = image.dataUrl || null;
+        } catch (cameraError) {
+          console.warn('Error con Capacitor Camera:', cameraError);
+          this.mostrarToast('Error al abrir la cámara', 'warning');
+        }
+      } else {
+        this.mostrarToast('Cámara no disponible', 'warning');
+      }
 
     } catch (error: any) {
       console.error('Error tomando foto:', error);
-      
-      let mensaje = 'Error al tomar foto';
-      if (error?.message) {
-        if (error.message.includes('Permission denied')) {
-          mensaje = 'Permiso de cámara denegado. Por favor permita el acceso a la cámara.';
-        } else if (error.message.includes('No Camera available')) {
-          mensaje = 'No hay cámara disponible en este dispositivo.';
-        } else if (error.message.includes('User cancelled')) {
-          mensaje = 'Captura de foto cancelada';
-          return; // No mostrar toast para cancelación del usuario
-        } else if (error.message.includes('Cannot read properties')) {
-          mensaje = 'Error de inicialización de cámara. Use "Seleccionar" para subir foto.';
-        } else {
-          mensaje = `Error: ${error.message}`;
-        }
-      } else {
-        mensaje = 'Error de cámara. Use "Seleccionar" para subir foto desde galería.';
-      }
-      
-      this.mostrarToast(mensaje, 'warning');
+      this.mostrarToast('Error al acceder a la cámara', 'warning');
     }
   }
 
-  private isRunningInApp(): boolean {
+  private async tomarFotoWeb(): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      // Verificar soporte de la API de MediaDevices
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        this.mostrarToast('La cámara no está disponible en este navegador', 'warning');
+        resolve(null);
+        return;
+      }
+
+      // Crear elemento de video temporal para capturar la cámara
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      video.setAttribute('autoplay', '');
+      video.setAttribute('muted', '');
+      video.setAttribute('playsinline', '');
+      video.style.position = 'fixed';
+      video.style.top = '0';
+      video.style.left = '0';
+      video.style.width = '100%';
+      video.style.height = '100%';
+      video.style.zIndex = '9999';
+      video.style.backgroundColor = 'black';
+
+      // Botón de captura circular como cámara de celular
+      const captureButton = document.createElement('button');
+      captureButton.style.position = 'fixed';
+      captureButton.style.bottom = '50px';
+      captureButton.style.left = '50%';
+      captureButton.style.transform = 'translateX(-50%)';
+      captureButton.style.zIndex = '10000';
+      captureButton.style.width = '70px';
+      captureButton.style.height = '70px';
+      captureButton.style.borderRadius = '50%';
+      captureButton.style.border = '4px solid white';
+      captureButton.style.backgroundColor = 'transparent';
+      captureButton.style.cursor = 'pointer';
+      captureButton.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
+
+      // Botón cancelar moderno (X)
+      const cancelButton = document.createElement('button');
+      cancelButton.innerHTML = '✕';
+      cancelButton.style.position = 'fixed';
+      cancelButton.style.top = '20px';
+      cancelButton.style.right = '20px';
+      cancelButton.style.zIndex = '10000';
+      cancelButton.style.width = '40px';
+      cancelButton.style.height = '40px';
+      cancelButton.style.borderRadius = '50%';
+      cancelButton.style.backgroundColor = 'rgba(255,255,255,0.2)';
+      cancelButton.style.color = 'white';
+      cancelButton.style.border = 'none';
+      cancelButton.style.fontSize = '20px';
+      cancelButton.style.fontWeight = 'bold';
+      cancelButton.style.cursor = 'pointer';
+      cancelButton.style.backdropFilter = 'blur(10px)';
+
+      // Botón para cambiar a galería (como en celulares)
+      const galleryButton = document.createElement('button');
+      galleryButton.innerHTML = '🖼️';
+      galleryButton.style.position = 'fixed';
+      galleryButton.style.bottom = '50px';
+      galleryButton.style.left = '30px';
+      galleryButton.style.zIndex = '10000';
+      galleryButton.style.width = '50px';
+      galleryButton.style.height = '50px';
+      galleryButton.style.borderRadius = '8px';
+      galleryButton.style.backgroundColor = 'rgba(255,255,255,0.9)';
+      galleryButton.style.border = 'none';
+      galleryButton.style.fontSize = '20px';
+      galleryButton.style.cursor = 'pointer';
+      galleryButton.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+
+      // Mini preview de la última foto tomada
+      const previewFrame = document.createElement('div');
+      previewFrame.style.position = 'fixed';
+      previewFrame.style.bottom = '50px';
+      previewFrame.style.right = '30px';
+      previewFrame.style.zIndex = '10000';
+      previewFrame.style.width = '50px';
+      previewFrame.style.height = '50px';
+      previewFrame.style.borderRadius = '8px';
+      previewFrame.style.border = '2px solid white';
+      previewFrame.style.backgroundColor = 'rgba(255,255,255,0.1)';
+      previewFrame.style.display = 'flex';
+      previewFrame.style.alignItems = 'center';
+      previewFrame.style.justifyContent = 'center';
+      previewFrame.style.fontSize = '20px';
+      previewFrame.style.color = 'white';
+
+      // Configurar canvas con dimensiones estándar
+      canvas.width = 640;
+      canvas.height = 480;
+
+      // Función para limpiar elementos
+      const cleanup = () => {
+        if (video.srcObject) {
+          const stream = video.srcObject as MediaStream;
+          stream.getTracks().forEach(track => track.stop());
+        }
+        video.remove();
+        canvas.remove();
+        captureButton.remove();
+        cancelButton.remove();
+        galleryButton.remove();
+        previewFrame.remove();
+      };
+
+      // Función para capturar foto
+      const capturePhoto = () => {
+        // Ajustar canvas al tamaño del video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Capturar frame
+        context?.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Convertir a dataURL
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        
+        cleanup();
+        resolve(dataUrl);
+      };
+
+      // Eventos de botones
+      captureButton.addEventListener('click', capturePhoto);
+      cancelButton.addEventListener('click', () => {
+        cleanup();
+        resolve(null);
+      });
+
+      // Evento para cambiar a galería
+      galleryButton.addEventListener('click', async () => {
+        cleanup();
+        // Cerrar la interfaz de cámara y abrir la galería directamente
+        await this.seleccionarFoto();
+        resolve(null);
+      });
+
+      // Intentar acceder a la cámara
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment', // Cámara trasera en móviles
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      })
+      .then(stream => {
+        video.srcObject = stream;
+        document.body.appendChild(video);
+        document.body.appendChild(captureButton);
+        document.body.appendChild(cancelButton);
+        document.body.appendChild(galleryButton);
+        document.body.appendChild(previewFrame);
+        
+        video.addEventListener('loadedmetadata', () => {
+          // Video listo para usar
+          this.mostrarToast('📷 Cámara abierta - Toca el círculo para capturar o 🖼️ para galería', 'success');
+        });
+
+        video.addEventListener('error', (error) => {
+          console.error('Error en video:', error);
+          cleanup();
+          this.mostrarToast('Error al acceder a la cámara', 'warning');
+          resolve(null);
+        });
+
+      })
+      .catch(error => {
+        console.error('Error accediendo a la cámara:', error);
+        
+        let mensaje = 'No se pudo acceder a la cámara.';
+        if (error.name === 'NotAllowedError') {
+          mensaje = 'Permiso de cámara denegado. Por favor permita el acceso a la cámara.';
+        } else if (error.name === 'NotFoundError') {
+          mensaje = 'No se encontró ninguna cámara en el dispositivo.';
+        } else if (error.name === 'NotSupportedError') {
+          mensaje = 'La cámara no está soportada en este navegador.';
+        }
+        
+        this.mostrarToast(mensaje, 'warning');
+        resolve(null);
+      });
+    });
+  }
+
+  isRunningInApp(): boolean {
     // Detectar si estamos corriendo en la app nativa vs navegador web
     return !!(window as any).Capacitor?.isNative;
   }
@@ -157,7 +312,7 @@ export class Tab2Page {
 
   async seleccionarFoto() {
     try {
-      // En entorno nativo, usar Camera con source:Photos
+      // En entorno nativo, intentar usar Camera solo si está disponible
       if (this.isRunningInApp() && Camera && Camera.getPhoto) {
         try {
           const image = await Camera.getPhoto({
@@ -175,7 +330,7 @@ export class Tab2Page {
         }
       }
       
-      // En entorno web, o si falla Camera en nativo, usar input file
+      // Usar input file (más compatible y confiable)
       if (this.fileInput?.nativeElement) {
         this.fileInput.nativeElement.click();
         this.mostrarToast('Abriendo selector de archivos...', 'success');
@@ -185,6 +340,7 @@ export class Tab2Page {
       
     } catch (error: any) {
       console.error('Error seleccionando foto:', error);
+      
       let mensaje = 'Error al seleccionar foto';
       
       if (error?.message) {
